@@ -36,8 +36,12 @@ if 'rec_rate' not in st.session_state: st.session_state['rec_rate'] = 0.0
 # ─────────────────────────────────────────────
 @st.cache_data
 def load_daily_data():
-    excel_path = Path(__file__).parent / "공급량(일일실적).xlsx"
-    if not excel_path.exists(): return pd.DataFrame()
+    # ✅ 수정됨: 기온 데이터가 모두 포함된 '일일공급량_raw.xlsx'를 읽도록 변경
+    excel_path = Path(__file__).parent / "일일공급량_raw.xlsx"
+    if not excel_path.exists(): 
+        st.error("⚠️ '일일공급량_raw.xlsx' 파일을 찾을 수 없습니다.")
+        return pd.DataFrame()
+        
     df = pd.read_excel(excel_path)
     df["일자"] = pd.to_datetime(df["일자"])
     df["연도"] = df["일자"].dt.year
@@ -162,7 +166,7 @@ def main():
     cal_df = load_effective_calendar()
     
     if df_daily.empty or df_plan.empty:
-        st.error("엑셀 파일들을 불러오지 못했습니다. 경로를 확인해주세요.")
+        st.warning("데이터를 불러오는 중입니다. 파일 경로를 다시 한 번 확인해주세요.")
         return
 
     # 사이드바 설정
